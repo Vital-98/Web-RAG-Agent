@@ -1,123 +1,118 @@
-LLM_MODEL = 'gemma3n:2b'  
-LLM_TIMEOUT = 30  
+import os
+from typing import Dict, Any
 
+class RAGConfig:
+    """for RAG Agent"""
+    
 
-MAX_SEARCH_RESULTS = 5  
-SEARCH_TIMEOUT = 15  
-ENABLE_DUCKDUCKGO_FALLBACK = True  
+    OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    OLLAMA_TIMEOUT = int(os.getenv("OLLAMA_TIMEOUT", "30"))
+    
+    # Model settings (Gemma 3N E2B)
+    DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "hf.co/unsloth/gemma-3n-E4B-it-GGUF:UD-Q4_K_XL")
+    DEFAULT_MAX_TOKENS = int(os.getenv("DEFAULT_MAX_TOKENS", "1000"))
+    DEFAULT_TEMPERATURE = float(os.getenv("DEFAULT_TEMPERATURE", "0.7"))
+    DEFAULT_TOP_P = float(os.getenv("DEFAULT_TOP_P", "0.9"))
+    
 
+    DEFAULT_SEARCH_ENGINE = os.getenv("DEFAULT_SEARCH_ENGINE", "google")
+    DEFAULT_MAX_RESULTS = int(os.getenv("DEFAULT_MAX_RESULTS", "3"))
+    
+    # Fallback search settings
+    ENABLE_SEARCH_FALLBACK = os.getenv("ENABLE_SEARCH_FALLBACK", "true").lower() == "true"
+    FALLBACK_THRESHOLD = int(os.getenv("FALLBACK_THRESHOLD", "2"))  # Minimum results before fallback
+    
 
-EXTRACTION_TIMEOUT = 15  
-MIN_CONTENT_LENGTH = 100  
-MAX_CHUNK_SIZE = 1200  
-ENABLE_TRAFILATURA = True  
-ENABLE_BEAUTIFULSOUP_FALLBACK = True 
+    
+    MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", "3000"))
+    REQUEST_TIMEOUT = int(os.getenv("REQUEST_TIMEOUT", "10"))
+    
 
+    MAX_WORKERS = int(os.getenv("MAX_WORKERS", "4"))  # Increased for parallel processing
+    ENABLE_CACHING = os.getenv("ENABLE_CACHING", "true").lower() == "true"
+    MAX_CACHE_SIZE = int(os.getenv("MAX_CACHE_SIZE", "1000"))
+    
+    # Parallel processing settings
+    ENABLE_PARALLEL_EXTRACTION = os.getenv("ENABLE_PARALLEL_EXTRACTION", "true").lower() == "true"
+    ENABLE_PARALLEL_PROCESSING = os.getenv("ENABLE_PARALLEL_PROCESSING", "true").lower() == "true"
+    
 
-USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-REQUEST_DELAY = 1  
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
+    MAIN_PROMPT_TEMPLATE = """Context: {context}
 
-PLAYWRIGHT_HEADLESS = True 
-PLAYWRIGHT_TIMEOUT = 10000  
+User Query: {query}
 
-# Output 
-SHOW_TIMING = True  
-SHOW_SOURCES = True  
-VERBOSE_LOGGING = False 
+Please provide a comprehensive, accurate, and concise answer based on the context provided. If the context doesn't contain enough information to answer the query, please say so clearly.
 
+Answer:"""
+    
+    SUMMARIZATION_PROMPT = """Please provide a concise summary of the following content in 2-3 sentences:
 
-GOOGLE_SEARCH_URL = "https://www.google.com/search?q={query}"
-DUCKDUCKGO_SEARCH_URL = "https://duckduckgo.com/html/?q={query}"
+{content}
 
-# Content Filtering
-BLOCKED_DOMAINS = [
-    'google.com',
-    'facebook.com',
-    'twitter.com',
-    'instagram.com',
-    'youtube.com'
-]
+Summary:"""
+    
+    KEY_POINTS_PROMPT = """Please extract 3 key points from the following content. Return them as a simple list:
 
-BLOCKED_CONTENT_TYPES = [
-    'script',
-    'style',
-    'nav',
-    'header',
-    'footer',
-    'aside',
-    'advertisement'
-]
+{content}
 
+Key points:"""
+    
 
-RANKING_ENABLED = True  
-MAX_RANKED_CHUNKS = 8  
-QUALITY_WEIGHT = 0.4 
-RELEVANCE_WEIGHT = 0.6 
+    ERROR_MESSAGES = {
+        "ollama_connection": "Failed to connect to Ollama. Make sure it's running: ollama serve",
+        "model_not_found": "Model not found. Install with: ollama pull gemma-3n-E2B-it",
+        "search_failed": "Search failed. Please try again or use a different search engine.",
+        "no_results": "No relevant information found. Please try rephrasing your query.",
+        "fallback_failed": "All search engines failed. Please check your internet connection."
+    }
 
-# Parallel scrap
-PARALLEL_SCRAPING_ENABLED = True  
-MAX_CONCURRENT_SCRAPES = 5  
-SCRAPING_TIMEOUT_PER_URL = 15  
-ENABLE_RATE_LIMITING = True  
-RATE_LIMIT_DELAY = 0.5  
-
-
-MAX_RETRIES = 3  
-RETRY_DELAY = 2 
-ENABLE_CAPTCHA_DETECTION = True  
-ENABLE_RETRY_MECHANISMS = True  
-
-# Scoring
-MIN_QUALITY_SCORE = 0.1  
-OPTIMAL_CONTENT_LENGTH_MIN = 500  
-OPTIMAL_CONTENT_LENGTH_MAX = 2000  
-MIN_SENTENCE_LENGTH = 10  
-MAX_SENTENCE_LENGTH = 25  
-OPTIMAL_PARAGRAPH_COUNT_MIN = 3  
-OPTIMAL_PARAGRAPH_COUNT_MAX = 10  
-MIN_DIVERSITY_RATIO = 0.5 
-
-# Relevance sscoring 
-TITLE_RELEVANCE_WEIGHT = 0.4  
-CONTENT_RELEVANCE_WEIGHT = 0.3  
-PROXIMITY_WEIGHT = 0.2  
-SEMANTIC_WEIGHT = 0.1  
-
-# Domain sources for quality scoring bonus
-CREDIBLE_DOMAINS = [
-    'wikipedia.org',
-    'mit.edu',
-    'stanford.edu',
-    'harvard.edu',
-    'nature.com',
-    'science.org',
-    'arxiv.org',
-    'ieee.org',
-    'acm.org',
-    'springer.com'
-]
-
-# Captcha detection 
-CAPTCHA_PATTERNS = [
-    r'captcha',
-    r'verify.*human',
-    r'robot.*check',
-    r'security.*check',
-    r'cloudflare',
-    r'ddos.*protection',
-    r'rate.*limit',
-    r'access.*denied',
-    r'blocked.*request',
-    r'bot.*detection'
-]
-
-# browser behavior
-BROWSER_HEADERS = {
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'Cache-Control': 'no-cache',
-    'Pragma': 'no-cache'
-}
+    # Timeout settings for different operations
+    TIMEOUTS = {
+        "search": 15,
+        "extraction": 20,
+        "llm_generation": 30,
+        "connection": 5
+    }
+    
+    # Retry settings
+    MAX_RETRIES = int(os.getenv("MAX_RETRIES", "2"))
+    RETRY_DELAY = float(os.getenv("RETRY_DELAY", "1.0"))
+    
+    @classmethod
+    def get_model_config(cls) -> Dict[str, Any]:
+        """Get configuration for Gemma 3N model"""
+        return {
+            "model_name": cls.DEFAULT_MODEL,
+            "base_url": cls.OLLAMA_BASE_URL,
+            "timeout": cls.OLLAMA_TIMEOUT,
+            "max_tokens": cls.DEFAULT_MAX_TOKENS,
+            "temperature": cls.DEFAULT_TEMPERATURE,
+            "top_p": cls.DEFAULT_TOP_P
+        }
+    
+    @classmethod
+    def get_processing_config(cls) -> Dict[str, Any]:
+        """Get processing configuration"""
+        return {
+            "max_workers": cls.MAX_WORKERS,
+            "enable_parallel_extraction": cls.ENABLE_PARALLEL_EXTRACTION,
+            "enable_parallel_processing": cls.ENABLE_PARALLEL_PROCESSING,
+            "enable_caching": cls.ENABLE_CACHING,
+            "max_cache_size": cls.MAX_CACHE_SIZE
+        }
+    
+    @classmethod
+    def get_search_config(cls) -> Dict[str, Any]:
+        """Get search configuration"""
+        return {
+            "default_engine": cls.DEFAULT_SEARCH_ENGINE,
+            "max_results": cls.DEFAULT_MAX_RESULTS,
+            "enable_fallback": cls.ENABLE_SEARCH_FALLBACK,
+            "fallback_threshold": cls.FALLBACK_THRESHOLD,
+            "timeout": cls.TIMEOUTS["search"]
+        }
+# Default configuration instance
+config = RAGConfig()
 
