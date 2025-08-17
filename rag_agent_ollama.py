@@ -715,14 +715,7 @@ class RAGAgent:
 
 def main():
     """Main function to demonstrate the RAG agent with fallback and parallel processing"""
-    print("=== RAG Agent with Fallback Search & Parallel Processing ===")
-    print("This agent uses Ollama for local LLM processing with robust search fallback.")
-    print("Features: Fallback search engines, parallel content extraction, caching")
-    print("Make sure Ollama is running: ollama serve")
-    print("Available models: llama2, mistral, codellama, gemma-3n-e4b-it, etc.")
-    print("Type 'quit' to exit.\n")
-    
-    
+    print("|| RAG Agent for query processing ||")
     model_name = "hf.co/unsloth/gemma-3n-E4B-it-GGUF:UD-Q4_K_XL"
     
     # Get parallel processing preference
@@ -742,7 +735,7 @@ def main():
         print(f"✓ Search engines available: {list(agent.searcher.engine_availability.keys())}")
     except Exception as e:
         print(f"✗ Failed to initialize agent: {e}")
-        print("Please make sure Ollama is running and the model is installed.")
+        print("Check if Ollama installed")
         return
     
     while True:
@@ -771,3 +764,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
