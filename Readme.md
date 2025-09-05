@@ -1,31 +1,10 @@
-The RAG Web Search Agent works in four main steps:
+In this attempt I have ensured that a strict RAG pipeline is followed and implemented.
+The first stage for the project; the web scraping for information from the user query was the most crucial part as I went through many iterations and blockades in web scraping effectively. At the end I decided to use selenium-base for the scraping as it was effectively able to fetch certain number of url and results. For parsing and cleaning I used beatiful soup.
 
-1.User Query – User enters a natural language question.
+The chunking and embedding part was accomplished using sentence-transformer and its in-library emmbedder. 
 
-2.Web Search – The agent searches the web (Google/DuckDuckGo) for relevant pages.
+While researching for RAG, cosine similarity often turned up for the determining of top chunks to be the efficent method for ranking. I did not use re-ranking even though it can be done using cross encoder  to get results on the quicker side and not to overcomplicate for this particular task.
 
-3.Content Extraction – Web pages are scraped and cleaned for useful text.
+I used the suggested gemma model from hugging face to be used for running the llm locally. My laptop has 4gb VRAM which is half of the minimumm 8GB VRAM required to efficiently run it, hnece the model processed it 100% on CPU and it takes upto 5-10 min to process the queries.
 
-4.Answer Generation – The local LLM (Gemma-3n via Ollama) processes the query + extracted content to produce a concise, accurate answer with sources.
-
-
-Features: 
-Web Search Integration – Finds and retrieves the most relevant online sources for a query.
-Content Extraction – Uses Playwright + BeautifulSoup + Trafilatura to scrape and clean web pages into usable text.
-Local LLM (Gemma-3n via Ollama) – Runs completely on your PC, avoiding APIs and vendor lock-in.
-Retrieval-Augmented Generation (RAG) – Combines search results with LLM reasoning to produce context-aware answers.
-Memory Support – Maintains conversational context using ListMemory for multi-turn queries.
-Modular Design – Agents, search, and LLM clients are separated for easy extension or swapping components.
-The model used here is gemma-3n-e2b-it as mentioned in the task : https://huggingface.co/unsloth/gemma-3n-E2B-it-GGUF/blob/main/gemma-3n-E2B-it-Q4_0.gguf
-
-While I do have 4GB of VRAM in my GPU, it was noticed that it takes upto 5 min for queries to be processed while running locally.
-The answers are on par with giving credible sources and overviews of the given queries, but can struggle due to some websites blcoking web scrapers. This can be potentially optimized and queries can be more concise in nature if autogen framework can be implemented, although it being more complex and potential API usage for best capabilities will have to addressed.
-
-Regarding Approach:
-The initial approach of autogen was diverted beacuse of many inconsistencies in dependencies and libraries used. AG2 does give more robust agent management but as it is a wrapper for autogen the latter issue was persistent. While this does change the direction of the rag implemented a bit but still the core concept of RAG remains same, infact I used AG2 RAG docs for reference and coding of the agents.
-
-
-Ollama setup:
-Requires ollama installed on the machine.
-Model is installed using "ollama pull"
-Model is started using "ollama serve"
+Finally the output from the rag is able to cite from sources albeit of some sites blocking access while scraping. It provides a decent summary and answer with proper citation of the ranked chunks from the best sources.
