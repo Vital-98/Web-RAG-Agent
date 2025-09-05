@@ -1,0 +1,1 @@
+The gcm DEPRECATED_ENDPOINT are Chromium internal errors. They are caused by Selenium initiating Chrome and connecting with the old GCM(Google Cloud Messaging) points resulting in this internal error.
