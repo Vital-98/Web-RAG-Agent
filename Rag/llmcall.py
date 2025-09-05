@@ -10,22 +10,27 @@ class LocalLLM:
     def generate_answer(self, query, context_chunks):
         log("Generating answer with local LLM")
         
-        # Prepare context with sources
         context_with_sources = ""
         for i, chunk in enumerate(context_chunks):
             context_with_sources += f"--- CHUNK {i+1} ---\n{chunk['text']}\n\n"
         
-        # Create prompt that forces citation
-        prompt = f"""Based ONLY on the following context information, answer the user's query. 
-Your answer must be concise, accurate, and must ONLY be based on the provided context. 
-If the context does not contain the answer, say "Based on the sources I found, I cannot answer this question."
+        prompt = f"""You are an expert AI assistant. Using ONLY the context information provided below, answer the user's query. 
 
 USER QUERY: {query}
 
 CONTEXT INFORMATION:
 {context_with_sources}
 
-IMPORTANT: Always cite your source by referring to the chunk number at the end of relevant sentences, like this: (Source: Chunk X).
+CRITICAL INSTRUCTIONS:
+1. You must base your answer ONLY on the provided context
+2. If the context contains relevant information, you MUST use it to answer
+3. You must base your answer ONLY on the provided context from these specific sources
+4. You must cite the actual source URL for each piece of information using this format: (Source: [full URL])
+5. If multiple sources support the same point, cite the most relevant one
+6. If the context doesn't contain the answer, say "The provided sources don't contain specific information about this."
+7. Keep your answer concise and factual
+8. Reference the source material where appropriate
+
 Answer:"""
         
         try:
