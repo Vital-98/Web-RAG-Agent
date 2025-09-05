@@ -24,16 +24,13 @@ class TextProcessor:
     
     def rank_chunks(self, query, chunks, top_k=3):
         log("Ranking chunks by relevance to query")
-        # Encode query and chunks
         query_embedding = self.embedder.encode(query, convert_to_tensor=True)
         chunk_embeddings = self.embedder.encode(chunks, convert_to_tensor=True)
         
-        # Compute similarity scores
+        # i found that cosine similarity was oftten mentioned while ranking used in raf flows
         cos_scores = util.cos_sim(query_embedding, chunk_embeddings)[0]
         
-        # Get top-k results
         top_results = cos_scores.topk(k=min(top_k, len(cos_scores)))
-        
         ranked_chunks = []
         for score, idx in zip(top_results[0], top_results[1]):
             ranked_chunks.append({
@@ -43,4 +40,5 @@ class TextProcessor:
             })
             
         log(f"Top chunk score: {ranked_chunks[0]['score']:.3f}")
+
         return ranked_chunks
