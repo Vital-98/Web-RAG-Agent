@@ -31,13 +31,13 @@ class GoogleSearcher:
 
         results = []
         try:
-            # Wait for search results to load - multiple possible selectors
+            # multiple possible selectors
             WebDriverWait(self.driver, 15).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "div.g, .tF2Cxc, .MjjYud"))
             )
-            time.sleep(2)  # Additional buffer time
+            time.sleep(2)  
 
-            # Try multiple possible selectors for Google results
+            #multiple possible selectors for Google results
             selectors = ["div.g", ".tF2Cxc", ".MjjYud"]
             search_items = []
             
@@ -48,7 +48,7 @@ class GoogleSearcher:
 
             for item in search_items:
                 try:
-                    # Try multiple title selectors
+                    # multiple title selectors (this was updated and referred through selenium and chrome as google has frequent ui changes)
                     title_selectors = ["h3", ".LC20lb", ".DKV0Md"]
                     title = ""
                     for selector in title_selectors:
@@ -59,10 +59,8 @@ class GoogleSearcher:
                         except NoSuchElementException:
                             continue
                     
-                    # Get URL
                     url = item.find_element(By.CSS_SELECTOR, "a").get_attribute("href")
                     
-                    # Try multiple snippet selectors
                     snippet_selectors = [".VwiC3b", ".MUxGbd", ".lyLwlc"]
                     snippet = ""
                     for selector in snippet_selectors:
@@ -73,7 +71,7 @@ class GoogleSearcher:
                         except NoSuchElementException:
                             continue
                     
-                    if title and url:  # Only add if we have basic info
+                    if title and url: 
                         results.append({
                             "title": title, 
                             "url": url, 
@@ -94,4 +92,5 @@ class GoogleSearcher:
 
     def close(self):
         """Close the browser."""
+
         self.driver.quit()
