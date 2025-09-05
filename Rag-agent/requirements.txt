@@ -1,9 +1,0 @@
-playwright
-playwright-stealth
-beautifulsoup4
-sentence-transformers
-faiss-cpu
-numpy
-tqdm
-fastapi
-uvicorn
